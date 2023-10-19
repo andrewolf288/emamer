@@ -26,8 +26,11 @@ export const AuthProvider = ({ children }) => {
       })
       .catch((e) => {
         console.log(e.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
-    setIsLoading(false);
+    
   };
 
   const logout = () => {

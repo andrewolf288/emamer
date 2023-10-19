@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 // Navigator
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -11,18 +11,41 @@ import NotificationScreen from "../screens/NotificationScreen";
 // Icons
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Feather from "react-native-vector-icons/Feather";
+import { AuthContext } from "../auth/context/AuthContext";
+import { ModulesMercapp } from "../util/ModulesMercapp";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 const HomeStack = () => {
+  const { userInfo } = useContext(AuthContext);
+  const { permisos } = userInfo;
+
+  const userModules = permisos
+    .map((userModule) => {
+      const matchingModule = ModulesMercapp.find(
+        (module) => module.name === userModule.refTabMod
+      );
+
+      return matchingModule; // Retornar el módulo correspondiente o null
+    })
+    .filter((module) => module !== null);
+
   return (
     <Stack.Navigator>
-      <Stack.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{ headerShown: false }}
-      />
+      <Stack.Screen name="Home" options={{ headerShown: true }}>
+        {() => <HomeScreen userModules={userModules} />}
+      </Stack.Screen>
+      {userModules.map((module, index) => {
+        return module ? (
+          <Stack.Screen
+            key={index}
+            name={module.name}
+            component={module.element}
+            options={{ headerShown: false }}
+          />
+        ) : null;
+      })}
     </Stack.Navigator>
   );
 };
@@ -33,7 +56,7 @@ const TabNavigator = () => {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarStyle: { backgroundColor: "#AD40AF" },
+        tabBarStyle: { backgroundColor: "#35572F" },
         tabBarInactiveTintColor: "#fff",
         tabBarActiveTintColor: "yellow",
       }}
@@ -44,7 +67,7 @@ const TabNavigator = () => {
         options={({ route }) => ({
           tabBarStyle: {
             display: getTabBarVisibility(route),
-            backgroundColor: "#AD40AF",
+            backgroundColor: "#35572F",
           },
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" color={color} size={size} />

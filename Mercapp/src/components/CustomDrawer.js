@@ -12,19 +12,15 @@ import {
 } from "@react-navigation/drawer";
 
 import Ionicons from "react-native-vector-icons/Ionicons";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { AuthContext } from "../auth/context/AuthContext";
 
 const CustomDrawer = (props) => {
   const { logout, userInfo } = useContext(AuthContext);
   return (
     <View style={{ flex: 1 }}>
-      <DrawerContentScrollView
-        {...props}
-        contentContainerStyle={{ backgroundColor: "#8200d6" }}
-      >
+      <DrawerContentScrollView {...props}>
         <ImageBackground
-          source={require("../assets/images/menu-bg.jpeg")}
+          source={require("../assets/images/menu-bg-3.jpg")}
           style={{ padding: 20 }}
         >
           <Image
