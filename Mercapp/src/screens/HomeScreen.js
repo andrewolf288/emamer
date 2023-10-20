@@ -3,6 +3,7 @@ import React from "react";
 import { useNavigation } from "@react-navigation/native";
 
 const HomeScreen = ({ userModules }) => {
+  console.log(userModules);
   const navigation = useNavigation();
 
   return (

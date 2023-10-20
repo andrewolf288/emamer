@@ -13,6 +13,7 @@ import CreateAsistencia from "../modules/asistencia/screens/CreateAsistencia";
 import InventariadoImage from "../assets/images/inventariado-supermercado.png";
 import PedidoImage from "../assets/images/pedido-supermercado.png";
 import AsistenciaImage from "../assets/images/asistencia.png";
+import CobranzaImage from "../assets/images/cobranza.png";
 
 const Stack = createNativeStackNavigator();
 
@@ -40,7 +41,7 @@ export const ModulesMercapp = [
     name: "cobranza",
     element: CreateCobranza,
     nameLabel: "Cobranza",
-    image: "",
+    image: CobranzaImage,
   },
   {
     name: "asistencia",

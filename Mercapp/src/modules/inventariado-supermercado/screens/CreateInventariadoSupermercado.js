@@ -7,54 +7,45 @@ import {
   Modal,
   FlatList,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
+import { getSupermercadosWithSucursales } from "../../../helpers/supermercados/getSupermercadosWithSucursales";
+import { getProductosBySupermercadoSucursal } from "../../../helpers/supermercados/getProductosBySupermercadoSucursal";
 
-const supermarkets = [
-  {
-    nombre: "SAGA FALABELLA",
-    sucursales: [
-      {
-        nombre: "SAGA FALABELLA CANTERAS",
-      },
-      {
-        nombre: "SAGA FALABELLA MOLINA",
-      },
-    ],
-  },
-  {
-    nombre: "METRO",
-    sucursales: [
-      {
-        nombre: "METRO AV. LIMA",
-      },
-      {
-        nombre: "METRO SAN ISIDRO",
-      },
-    ],
-  },
-];
 const CreateInventariadoSupermercado = () => {
-  // estado 0: seleccion supermercado sucursal
-  // estado 1: estado de carga
-  // estado 2: screen create inventariado supermercado
+  // estado de la pantalla
   const [stateScreen, setStateScreen] = useState(0);
+  // datos de supermercados con sus sucursales
+  const [dataSupermercados, setDataSupermercados] = useState([]);
+  //datos de productos por supermercado sucursal
+  const [
+    dataProductosSupermercadoSucursal,
+    setDataProductosSupermercadoSucursal,
+  ] = useState([]);
 
+  // supermercado seleccionado
   const [selectedSupermercado, setSelectedSupermercado] = useState(null);
+  // supermercado sucursal seleccionado
   const [selectedSupermercadoSucursal, setSelectedSupermercadoSucursal] =
     useState(null);
 
+  // manejador de navegacion
   const navigation = useNavigation();
 
+  // manejador de seleccion de supermercado
   const handleSupermercadoSelect = (value) => {
-    console.log(value);
     setSelectedSupermercado(value);
-    setSelectedSupermercadoSucursal(null); // Resetea la sucursal seleccionada
+    // reset supermercado sucursal
+    setSelectedSupermercadoSucursal(null);
   };
 
+  // manejador de seleccion de supermercado sucursal
   const handleSucursal = (value) => {
     setSelectedSupermercadoSucursal(value);
+    // hacemos un llamado al backend para traer informacion de productos por supermercado sucursal
+    traerProductosBySupermercadoSucursal();
+    // cambiamos de estado de pantalla y mostramos el formulario
     setStateScreen(1);
     setTimeout(() => {
       setStateScreen(2);
@@ -72,6 +63,28 @@ const CreateInventariadoSupermercado = () => {
     setSelectedSupermercadoSucursal(null);
     setSelectedSupermercado(null);
   };
+
+  const traerProductosBySupermercadoSucursal = async (idSupMerSuc) => {
+    try {
+      const result = await getProductosBySupermercadoSucursal(idSupMerSuc);
+      setDataProductosSupermercadoSucursal(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const traerSupermercadosWithSucursales = async () => {
+    try {
+      const result = await getSupermercadosWithSucursales();
+      setDataSupermercados(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    traerSupermercadosWithSucursales();
+  }, []);
 
   switch (stateScreen) {
     case 0:
@@ -91,14 +104,14 @@ const CreateInventariadoSupermercado = () => {
                     Seleccione un supermercado:
                   </Text>
                   <FlatList
-                    data={supermarkets}
-                    keyExtractor={(item) => item.nombre}
+                    data={dataSupermercados}
+                    keyExtractor={(item) => item.codSupMer}
                     renderItem={({ item }) => (
                       <TouchableOpacity
                         onPress={() => handleSupermercadoSelect(item)}
                         style={styles.item}
                       >
-                        <Text>{item.nombre}</Text>
+                        <Text>{item.nomSupMer}</Text>
                       </TouchableOpacity>
                     )}
                   />
@@ -119,15 +132,13 @@ const CreateInventariadoSupermercado = () => {
                   <Text style={styles.heading}>Seleccione una sucursal:</Text>
                   <FlatList
                     data={selectedSupermercado.sucursales}
-                    keyExtractor={(item, index) => {
-                      `${item.nombre} - ${index}`;
-                    }}
+                    keyExtractor={(item) => item.codSupMerSuc}
                     renderItem={({ item }) => (
                       <TouchableOpacity
                         onPress={() => handleSucursal(item)}
                         style={styles.item}
                       >
-                        <Text>{item.nombre}</Text>
+                        <Text>{item.nomSupMerSuc}</Text>
                       </TouchableOpacity>
                     )}
                   />
